@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather/screens/location.dart';
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
@@ -12,9 +13,9 @@ class SearchScreen extends StatelessWidget {
             onPressed: () {
               Navigator.of(
                 context,
-              ).push(MaterialPageRoute(builder: (cntx) => Text('Map')));
+              ).push(MaterialPageRoute(builder: (cntx) => Location()));
             },
-            icon: Icon(Icons.map),
+            icon: Icon(Icons.location_on),
           ),
         ],
       ),
