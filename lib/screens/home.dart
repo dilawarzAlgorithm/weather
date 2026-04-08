@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:weather/model/weather_icon.dart';
 import 'package:weather/screens/search.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -38,7 +37,7 @@ class HomeScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      weatherIcon['sunny']!,
+                      Icon(Icons.sunny, color: Colors.orange),
                       SizedBox(width: 10),
                       Text(
                         'Weather App',
