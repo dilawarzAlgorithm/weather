@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       drawer: Drawer(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(130),
         elevation: 2,
         child: Column(
           children: [
@@ -64,7 +64,9 @@ class HomeScreen extends StatelessWidget {
               onTap: () {},
               leading: Icon(Icons.settings),
               title: Text('Setting'),
-              tileColor: Theme.of(context).colorScheme.secondaryFixed,
+              tileColor: Theme.of(
+                context,
+              ).colorScheme.secondaryFixed.withAlpha(220),
               textColor: Theme.of(context).colorScheme.onSecondaryFixed,
               iconColor: Theme.of(context).colorScheme.onSecondaryFixed,
             ),
@@ -78,7 +80,9 @@ class HomeScreen extends StatelessWidget {
               },
               leading: Icon(Icons.search),
               title: Text('Search'),
-              tileColor: Theme.of(context).colorScheme.secondaryFixed,
+              tileColor: Theme.of(
+                context,
+              ).colorScheme.secondaryFixed.withAlpha(220),
               textColor: Theme.of(context).colorScheme.onSecondaryFixed,
               iconColor: Theme.of(context).colorScheme.onSecondaryFixed,
             ),

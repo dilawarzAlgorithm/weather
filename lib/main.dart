@@ -3,9 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:weather/screens/home.dart';
 
 final colorScheme = ColorScheme.fromSeed(
-  brightness: Brightness.dark,
-  seedColor: const Color.fromARGB(255, 117, 147, 231),
-  surface: const Color.fromARGB(255, 91, 103, 207),
+  seedColor: const Color(0xFF0284C7),
+  surface: const Color(0xFFF8FAFC),
+  primary: const Color(0xFF0EA5E9),
+  onSurface: const Color(0xFF0F172A),
 );
 
 final theme = ThemeData().copyWith(

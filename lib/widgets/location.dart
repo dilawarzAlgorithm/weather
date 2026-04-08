@@ -10,33 +10,77 @@ class Location extends StatefulWidget {
 }
 
 class _LocationState extends State<Location> {
+  late TextEditingController _cityController;
+
+  @override
+  void initState() {
+    super.initState();
+    _cityController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _cityController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (cntx, constraints) {
-        final screenHeight = MediaQuery.of(context).size.height;
-        return SizedBox(
-          height: screenHeight,
-          child: Padding(
-            padding: EdgeInsetsGeometry.all(16),
-            child: Column(
+    return Container(
+      color: Theme.of(context).colorScheme.surface,
+      height: MediaQuery.of(context).size.height,
+      child: Padding(
+        padding: EdgeInsetsGeometry.all(16),
+        child: Column(
+          children: [
+            Row(
               children: [
-                TextField(
-                  decoration: InputDecoration(hintText: 'Search city...'),
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(Icons.keyboard_arrow_left),
+                  iconSize: 40,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
-                SizedBox(height: 20),
-                const SizedBox(height: 20),
-                Expanded(child: Center(child: Text('Map View will be here'))),
-                SizedBox(height: 20),
-                ElevatedButton(
+                Expanded(
+                  child: TextField(
+                    controller: _cityController,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Search city...',
+                      labelText: 'Search City',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                    ),
+                  ),
+                ),
+                IconButton(
                   onPressed: () {},
-                  child: Text('Add this Location'),
+                  icon: Icon(Icons.gps_fixed),
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ],
             ),
-          ),
-        );
-      },
+            SizedBox(height: 20),
+            const SizedBox(height: 20),
+            Expanded(child: Center(child: Text('Map View will be here'))),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {},
+              child: Text(
+                'Add this Location',
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
