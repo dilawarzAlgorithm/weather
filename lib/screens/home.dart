@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:weather/screens/search.dart';
+import 'package:weather/widgets/home.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -20,7 +21,7 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       drawer: Drawer(
-        backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(130),
+        backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(240),
         elevation: 2,
         child: Column(
           children: [
@@ -61,17 +62,6 @@ class HomeScreen extends StatelessWidget {
             ),
             Divider(height: 1, thickness: 1),
             ListTile(
-              onTap: () {},
-              leading: Icon(Icons.settings),
-              title: Text('Setting'),
-              tileColor: Theme.of(
-                context,
-              ).colorScheme.secondaryFixed.withAlpha(220),
-              textColor: Theme.of(context).colorScheme.onSecondaryFixed,
-              iconColor: Theme.of(context).colorScheme.onSecondaryFixed,
-            ),
-            Divider(height: 1, thickness: 1),
-            ListTile(
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(
@@ -90,7 +80,7 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: Text('Home screen'),
+      body: Home(),
     );
   }
 }

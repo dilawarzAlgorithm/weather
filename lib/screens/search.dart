@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather/model/weather.dart';
+import 'package:weather/widgets/home.dart';
 import 'package:weather/widgets/location.dart';
 
 class SearchScreen extends StatelessWidget {
@@ -41,66 +42,6 @@ class SearchScreen extends StatelessWidget {
       );
     }
 
-    Widget content = ListView(
-      children: [
-        for (final list in _lists)
-          Card(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            margin: EdgeInsets.all(12),
-            child: ListTile(
-              title: Text(list.city),
-              subtitle: Text(
-                '${list.location}\n${DateFormat('EE').format(list.dateTime)}, ${DateFormat('dd MMMM').format(list.dateTime)} at ${DateFormat('hh:mm a').format(list.dateTime)}',
-              ),
-              trailing: SizedBox(
-                width: 80,
-                child: Row(
-                  children: [
-                    weatherIcon[list.weather]!,
-                    SizedBox(width: 5),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '${list.maxTemperature.round().toString()}°',
-                          style: Theme.of(context).textTheme.bodyMedium!
-                              .copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onPrimaryContainer,
-                                fontSize: 17,
-                              ),
-                        ),
-                        Text(
-                          '${list.minTemperature.round()}° / ${list.maxTemperature.round()}°',
-                          style: Theme.of(context).textTheme.bodyMedium!
-                              .copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSecondaryContainer,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
-
-    if (_lists.isEmpty) {
-      content = Center(
-        child: Text(
-          'No saved places.',
-          style: Theme.of(context).textTheme.titleLarge!.copyWith(
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Widget'),
@@ -111,11 +52,74 @@ class SearchScreen extends StatelessWidget {
               openLocationMap();
             },
             icon: Icon(Icons.location_on),
+            color: Theme.of(context).colorScheme.onSurface,
           ),
-          IconButton(onPressed: () {}, icon: Icon(Icons.refresh_sharp)),
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.refresh_sharp),
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ],
       ),
-      body: content,
+      body: (_lists.isEmpty)
+          ? Center(
+              child: Text(
+                'No saved places.',
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            )
+          : ListView.builder(
+              itemCount: _lists.length,
+              itemBuilder: (cntx, index) {
+                final list = _lists[index];
+                return Card(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  margin: EdgeInsets.all(12),
+                  child: ListTile(
+                    onTap: () => Home(),
+                    title: Text(list.city),
+                    subtitle: Text(
+                      '${list.location}\n${DateFormat('EE').format(list.dateTime)}, ${DateFormat('dd MMMM').format(list.dateTime)} at ${DateFormat('hh:mm a').format(list.dateTime)}',
+                    ),
+                    trailing: SizedBox(
+                      width: 80,
+                      child: Row(
+                        children: [
+                          weatherIcon[list.weather]!,
+                          SizedBox(width: 5),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '${list.maxTemperature.round().toString()}°',
+                                style: Theme.of(context).textTheme.bodyMedium!
+                                    .copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimaryContainer,
+                                      fontSize: 17,
+                                    ),
+                              ),
+                              Text(
+                                '${list.minTemperature.round()}° / ${list.maxTemperature.round()}°',
+                                style: Theme.of(context).textTheme.bodyMedium!
+                                    .copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSecondaryContainer,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }

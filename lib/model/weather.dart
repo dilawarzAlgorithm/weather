@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 enum WeatherList { sunny, rainy }
 
@@ -17,11 +18,13 @@ class Weather {
     required this.minTemperature,
     required this.maxTemperature,
     required this.humidity,
-  }) : dateTime = DateTime.now();
+  }) : dateTime = DateTime.now(),
+       id = Uuid().v4();
 
+  final String id;
   final DateTime dateTime;
-  final int latitude;
-  final int longitude;
+  final double latitude;
+  final double longitude;
   final String city;
   final String location;
   final WeatherList weather;
