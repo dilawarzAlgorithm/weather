@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:weather/provider/weather_notifier.dart';
+import 'package:location/location.dart' as loc;
 
 class LocationScreen extends ConsumerStatefulWidget {
   const LocationScreen({super.key});
@@ -27,49 +28,98 @@ class _LocationState extends ConsumerState<LocationScreen> {
     super.dispose();
   }
 
-  // Logic to handle adding the city
   Future<void> _onAddLocation() async {
     final cityName = _cityController.text.trim();
     if (cityName.isEmpty) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
-      // Calling our Riverpod Notifier
       await ref.read(savedWeatherProvider.notifier).addCity(cityName);
+      if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      _showError('Error: Could not find "$cityName".');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
-      if (mounted) {
-        Navigator.of(context).pop(); // Close modal on success
+  Future<void> _getCurrentLocation() async {
+    setState(() => _isLoading = true);
+    debugPrint('GPS: Starting location request...');
+
+    try {
+      loc.Location location = loc.Location();
+
+      // Step 1: Service Check with Timeout
+      debugPrint('GPS: Checking if service is enabled...');
+      bool serviceEnabled = await location.serviceEnabled().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => throw Exception('Location service check timed out.'),
+      );
+
+      if (!serviceEnabled) {
+        serviceEnabled = await location.requestService();
+        if (!serviceEnabled) throw Exception('Location service is disabled.');
+      }
+
+      // Step 2: Permission Check
+      debugPrint('GPS: Checking permissions...');
+      loc.PermissionStatus permissionGranted = await location.hasPermission();
+      if (permissionGranted == loc.PermissionStatus.denied) {
+        permissionGranted = await location.requestPermission();
+        if (permissionGranted != loc.PermissionStatus.granted) {
+          throw Exception('Location permission denied.');
+        }
+      }
+
+      // Step 3: Fetch Position with strict Timeout
+      debugPrint('GPS: Fetching coordinates from Simulator...');
+      // If this hangs, the Simulator "Features > Location" is not working correctly
+      final locationData = await location.getLocation().timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => throw Exception(
+          'Simulator did not return coordinates. Change Features > Location.',
+        ),
+      );
+
+      if (locationData.latitude != null && locationData.longitude != null) {
+        debugPrint(
+          'GPS: Coordinates received: ${locationData.latitude}, ${locationData.longitude}',
+        );
+        await ref
+            .read(savedWeatherProvider.notifier)
+            .addCityByLocation(locationData.latitude!, locationData.longitude!);
+
+        if (mounted) Navigator.of(context).pop();
+      } else {
+        throw Exception('Location data is empty.');
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Error: Could not find "$cityName". Please check spelling.',
-            ),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
+      debugPrint('GPS ERROR: $e');
+      _showError(e.toString().replaceAll('Exception: ', ''));
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+        duration: const Duration(seconds: 4),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        margin: EdgeInsets.only(top: 40),
-        color: Theme.of(context).colorScheme.surface,
-        height: MediaQuery.of(context).size.height * 0.8,
+      body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -78,14 +128,12 @@ class _LocationState extends ConsumerState<LocationScreen> {
                 children: [
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.keyboard_arrow_left),
-                    iconSize: 40,
+                    icon: const Icon(Icons.keyboard_arrow_left, size: 40),
                   ),
                   Expanded(
                     child: TextField(
                       controller: _cityController,
-                      onSubmitted: (_) =>
-                          _onAddLocation(), // Search on Enter key
+                      onSubmitted: (_) => _onAddLocation(),
                       decoration: InputDecoration(
                         hintText: 'Search city...',
                         labelText: 'Search City',
@@ -96,16 +144,14 @@ class _LocationState extends ConsumerState<LocationScreen> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: _isLoading ? null : _getCurrentLocation,
                     icon: const Icon(Icons.gps_fixed),
                   ),
                 ],
               ),
-              const SizedBox(height: 40),
-              const Expanded(
-                child: Center(child: Text('Map View will be here')),
-              ),
-              const SizedBox(height: 20),
+              const Spacer(),
+              const Center(child: Text('Map View will be here')),
+              const Spacer(),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

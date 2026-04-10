@@ -65,7 +65,7 @@ class Home extends ConsumerWidget {
           ),
           const Divider(height: 40),
           Text(
-            'Last updated: ${DateFormat('hh:mm a').format(weather.dateTime)}',
+            'Last updated: ${DateFormat('h:mm a').format(weather.lastUpdated)}',
             style: Theme.of(context).textTheme.labelLarge,
           ),
         ],

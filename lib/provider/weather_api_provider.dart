@@ -5,7 +5,6 @@ import 'package:weather/models/weather.dart';
 import 'package:weather/provider/weather_repository.dart';
 
 class WeatherApiProvider implements IWeatherRepository {
-  // Use getters to ensure we fetch values AFTER dotenv is loaded
   String get _baseUrl => dotenv.env['BASE_URL'] ?? "";
   String get _apiKey => dotenv.env['WEATHER_API_KEY'] ?? "";
 
