@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:weather/screens/search.dart';
-import 'package:weather/widgets/home.dart';
+import 'package:weather/widgets/home_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

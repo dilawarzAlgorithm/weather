@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:weather/screens/home.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final colorScheme = ColorScheme.fromSeed(
   seedColor: const Color(0xFF0284C7),
@@ -19,8 +21,10 @@ final theme = ThemeData().copyWith(
   ),
 );
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env/.env");
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

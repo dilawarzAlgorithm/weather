@@ -1,50 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:weather/model/weather.dart';
-import 'package:weather/widgets/home.dart';
-import 'package:weather/widgets/location.dart';
+import 'package:weather/models/weather.dart';
+import 'package:weather/provider/weather_notifier.dart';
+import 'package:weather/widgets/home_widget.dart';
+import 'package:weather/screens/location.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SearchScreen extends StatelessWidget {
-  SearchScreen({super.key});
-
-  final List<Weather> _lists = [
-    Weather(
-      latitude: 21,
-      longitude: 22,
-      city: 'Pune',
-      location: 'Maharashtra, India',
-      weather: WeatherList.sunny,
-      minTemperature: 24,
-      maxTemperature: 30,
-      humidity: 10,
-    ),
-    Weather(
-      latitude: -122,
-      longitude: 84,
-      city: 'Dharwad',
-      location: 'Karnataka, India',
-      weather: WeatherList.rainy,
-      minTemperature: 10,
-      maxTemperature: 24,
-      humidity: 100,
-    ),
-  ];
+class SearchScreen extends ConsumerWidget {
+  const SearchScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final List<WeatherModel> lists = ref.watch(savedWeatherProvider);
+
     void openLocationMap() {
-      showModalBottomSheet(
-        useSafeArea: true,
-        isScrollControlled: true,
-        context: context,
-        constraints: const BoxConstraints(maxWidth: double.infinity),
-        builder: (cntx) => Location(),
-      );
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (cntx) => LocationScreen()));
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Widget'),
+        title: Text('Weather'),
         centerTitle: false,
         actions: [
           IconButton(
@@ -61,7 +38,7 @@ class SearchScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: (_lists.isEmpty)
+      body: (lists.isEmpty)
           ? Center(
               child: Text(
                 'No saved places.',
@@ -71,9 +48,9 @@ class SearchScreen extends StatelessWidget {
               ),
             )
           : ListView.builder(
-              itemCount: _lists.length,
+              itemCount: lists.length,
               itemBuilder: (cntx, index) {
-                final list = _lists[index];
+                final list = lists[index];
                 return Card(
                   color: Theme.of(context).colorScheme.primaryContainer,
                   margin: EdgeInsets.all(12),
@@ -81,19 +58,19 @@ class SearchScreen extends StatelessWidget {
                     onTap: () => Home(),
                     title: Text(list.city),
                     subtitle: Text(
-                      '${list.location}\n${DateFormat('EE').format(list.dateTime)}, ${DateFormat('dd MMMM').format(list.dateTime)} at ${DateFormat('hh:mm a').format(list.dateTime)}',
+                      '${list.city}\n${DateFormat('EE').format(list.dateTime)}, ${DateFormat('dd MMMM').format(list.dateTime)} at ${DateFormat('hh:mm a').format(list.dateTime)}',
                     ),
                     trailing: SizedBox(
-                      width: 80,
+                      width: 90,
                       child: Row(
                         children: [
-                          weatherIcon[list.weather]!,
+                          Image.network(list.iconUrl, width: 40),
                           SizedBox(width: 5),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                '${list.maxTemperature.round().toString()}°',
+                                '${list.tempC.round().toString()}°',
                                 style: Theme.of(context).textTheme.bodyMedium!
                                     .copyWith(
                                       color: Theme.of(
@@ -103,7 +80,7 @@ class SearchScreen extends StatelessWidget {
                                     ),
                               ),
                               Text(
-                                '${list.minTemperature.round()}° / ${list.maxTemperature.round()}°',
+                                '${list.tempC.round()}° / ${list.tempC.round()}°',
                                 style: Theme.of(context).textTheme.bodyMedium!
                                     .copyWith(
                                       color: Theme.of(
