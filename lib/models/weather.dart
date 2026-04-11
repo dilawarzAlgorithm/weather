@@ -2,9 +2,14 @@ class WeatherModel {
   final String id;
   final String city;
   final String region;
+  final String country;
   final DateTime lastUpdated;
   final double tempC;
   final double tempF;
+  final double maxTempC;
+  final double maxTempF;
+  final double minTempC;
+  final double minTempF;
   final double feelsLikeC;
   final double feelsLikeF;
   final String condition;
@@ -22,9 +27,14 @@ class WeatherModel {
     required this.id,
     required this.city,
     required this.region,
+    required this.country,
     required this.lastUpdated,
     required this.tempC,
     required this.tempF,
+    required this.maxTempC,
+    required this.maxTempF,
+    required this.minTempC,
+    required this.minTempF,
     required this.feelsLikeC,
     required this.feelsLikeF,
     required this.condition,
@@ -42,6 +52,7 @@ class WeatherModel {
   factory WeatherModel.fromJson(Map<String, dynamic> json) {
     final current = json['current'];
     final location = json['location'];
+    final dayForecast = json['forecast']['forecastday'][0]['day'];
 
     // Create a stable ID using city and region to avoid duplicates
     final cityId = '${location['name']}_${location['region']}'
@@ -52,9 +63,14 @@ class WeatherModel {
       id: cityId,
       city: location['name'],
       region: location['region'],
+      country: location['country'] ?? '',
       lastUpdated: DateTime.now(),
       tempC: (current['temp_c'] as num).toDouble(),
       tempF: (current['temp_f'] as num).toDouble(),
+      maxTempC: (dayForecast['maxtemp_c'] as num).toDouble(),
+      maxTempF: (dayForecast['maxtemp_f'] as num).toDouble(),
+      minTempC: (dayForecast['mintemp_c'] as num).toDouble(),
+      minTempF: (dayForecast['mintemp_f'] as num).toDouble(),
       feelsLikeC: (current['feelslike_c'] as num).toDouble(),
       feelsLikeF: (current['feelslike_f'] as num).toDouble(),
       condition: current['condition']['text'],

@@ -124,7 +124,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         '${list.city}\n${DateFormat("EE, dd MMMM 'at' hh:mm a").format(list.lastUpdated)}',
                       ),
                       trailing: SizedBox(
-                        width: 90,
+                        width: 115,
                         child: Row(
                           children: [
                             Image.network(list.iconUrl, width: 40),
@@ -133,7 +133,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  '${list.tempC.round().toString()}°',
+                                  '${list.feelsLikeC.round().toString()}°',
                                   style: Theme.of(context).textTheme.bodyMedium!
                                       .copyWith(
                                         color: Theme.of(
@@ -143,7 +143,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                       ),
                                 ),
                                 Text(
-                                  '${list.tempC.round()}° / ${list.tempC.round()}°',
+                                  '↓${list.minTempC.round()}° /↑${list.maxTempC.round()}°',
                                   style: Theme.of(context).textTheme.bodyMedium!
                                       .copyWith(
                                         color: Theme.of(

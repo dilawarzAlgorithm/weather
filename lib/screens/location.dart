@@ -46,13 +46,10 @@ class _LocationState extends ConsumerState<LocationScreen> {
 
   Future<void> _getCurrentLocation() async {
     setState(() => _isLoading = true);
-    debugPrint('GPS: Starting location request...');
 
     try {
       loc.Location location = loc.Location();
 
-      // Step 1: Service Check with Timeout
-      debugPrint('GPS: Checking if service is enabled...');
       bool serviceEnabled = await location.serviceEnabled().timeout(
         const Duration(seconds: 5),
         onTimeout: () => throw Exception('Location service check timed out.'),
@@ -63,8 +60,6 @@ class _LocationState extends ConsumerState<LocationScreen> {
         if (!serviceEnabled) throw Exception('Location service is disabled.');
       }
 
-      // Step 2: Permission Check
-      debugPrint('GPS: Checking permissions...');
       loc.PermissionStatus permissionGranted = await location.hasPermission();
       if (permissionGranted == loc.PermissionStatus.denied) {
         permissionGranted = await location.requestPermission();
@@ -73,9 +68,6 @@ class _LocationState extends ConsumerState<LocationScreen> {
         }
       }
 
-      // Step 3: Fetch Position with strict Timeout
-      debugPrint('GPS: Fetching coordinates from Simulator...');
-      // If this hangs, the Simulator "Features > Location" is not working correctly
       final locationData = await location.getLocation().timeout(
         const Duration(seconds: 10),
         onTimeout: () => throw Exception(
@@ -84,9 +76,6 @@ class _LocationState extends ConsumerState<LocationScreen> {
       );
 
       if (locationData.latitude != null && locationData.longitude != null) {
-        debugPrint(
-          'GPS: Coordinates received: ${locationData.latitude}, ${locationData.longitude}',
-        );
         await ref
             .read(savedWeatherProvider.notifier)
             .addCityByLocation(locationData.latitude!, locationData.longitude!);
@@ -96,7 +85,6 @@ class _LocationState extends ConsumerState<LocationScreen> {
         throw Exception('Location data is empty.');
       }
     } catch (e) {
-      debugPrint('GPS ERROR: $e');
       _showError(e.toString().replaceAll('Exception: ', ''));
     } finally {
       if (mounted) {
