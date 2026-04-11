@@ -57,7 +57,6 @@ class _HomeState extends ConsumerState<Home> {
             return _WeatherPage(weather: weatherList[index]);
           },
         ),
-        // Page Indicator Dots
         if (weatherList.length > 1)
           Padding(
             padding: const EdgeInsets.only(bottom: 20.0),
