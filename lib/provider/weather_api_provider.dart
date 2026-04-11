@@ -12,7 +12,7 @@ class WeatherApiProvider implements IWeatherRepository {
   Future<WeatherModel> fetchWeatherByCity(String cityName) async {
     // encodeComponent handles spaces in city names like "New York"
     final url = Uri.parse(
-      '$_baseUrl?key=$_apiKey&q=${Uri.encodeComponent(cityName)}&aqi=no',
+      '$_baseUrl?key=$_apiKey&q=${Uri.encodeComponent(cityName)}&days=1&aqi=no',
     );
 
     try {
@@ -31,7 +31,7 @@ class WeatherApiProvider implements IWeatherRepository {
 
   @override
   Future<WeatherModel> fetchWeatherByLocation(double lat, double lon) async {
-    final url = Uri.parse('$_baseUrl?key=$_apiKey&q=$lat,$lon&aqi=no');
+    final url = Uri.parse('$_baseUrl?key=$_apiKey&q=$lat,$lon&days=1&aqi=no');
 
     try {
       final response = await http.get(url);

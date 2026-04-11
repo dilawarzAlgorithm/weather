@@ -1,13 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:weather/models/weather.dart';
 import 'package:weather/provider/weather_notifier.dart';
 
-class Home extends ConsumerWidget {
+class Home extends ConsumerStatefulWidget {
   const Home({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<Home> createState() => _HomeState();
+}
+
+class _HomeState extends ConsumerState<Home> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final weatherList = ref.watch(savedWeatherProvider);
 
     if (weatherList.isEmpty) {
@@ -27,10 +42,57 @@ class Home extends ConsumerWidget {
       );
     }
 
-    final weather = weatherList.first;
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        PageView.builder(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() {
+              _currentPage = index;
+            });
+          },
+          itemCount: weatherList.length,
+          itemBuilder: (context, index) {
+            return _WeatherPage(weather: weatherList[index]);
+          },
+        ),
+        // Page Indicator Dots
+        if (weatherList.length > 1)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                weatherList.length,
+                (index) => Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: _currentPage == index ? 12 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _currentPage == index
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.grey.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
 
+class _WeatherPage extends StatelessWidget {
+  final WeatherModel weather;
+
+  const _WeatherPage({required this.weather});
+
+  @override
+  Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 60),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -49,6 +111,7 @@ class Home extends ConsumerWidget {
           ),
           const SizedBox(height: 40),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,142 +131,113 @@ class Home extends ConsumerWidget {
                 ],
               ),
               const Spacer(),
-              Image.network(weather.iconUrl, width: 70, fit: BoxFit.contain),
+              Image.network(weather.iconUrl, width: 90, fit: BoxFit.contain),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Text(
-            '↓${weather.minTempC.round()}° /↑${weather.maxTempC.round()}°\nFeels like: ${weather.feelsLikeC.round().toString()}°\n${DateFormat('EE, hh:mm a').format(DateTime.now())}',
+            '↓${weather.minTempC.round()}° / ↑${weather.maxTempC.round()}°\nFeels like: ${weather.feelsLikeC.round()}°\n${DateFormat('EEEE, hh:mm a').format(weather.lastUpdated)}',
             style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          const SizedBox(height: 30),
+
+          // Grids...
+          Wrap(
+            spacing: 30,
+            runSpacing: 16,
+            alignment: WrapAlignment.center,
             children: [
-              Container(
-                height: 130,
-                width: 130,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withAlpha(20),
-                  border: Border.all(style: BorderStyle.none),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                margin: EdgeInsets.all(12),
-                padding: EdgeInsets.all(8),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [Icon(Icons.sunny, size: 15), Text('UV index')],
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      weather.uv.toString(),
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 50,
-                      ),
-                    ),
-                  ],
-                ),
+              _DetailTile(
+                label: 'UV INDEX',
+                value: weather.uv.toString(),
+                icon: Icons.sunny,
               ),
-              SizedBox(width: 20),
-              Container(
-                height: 130,
-                width: 130,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withAlpha(20),
-                  border: Border.all(style: BorderStyle.none),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: EdgeInsets.all(8),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.water_drop, size: 15),
-                        Text('Humidity'),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      '${weather.humidity.toString()}%',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 50,
-                      ),
-                    ),
-                  ],
+              _DetailTile(
+                label: 'HUMIDITY',
+                value: '${weather.humidity}%',
+                icon: Icons.water_drop,
+              ),
+              _DetailTile(
+                label: 'PRECIPITATION',
+                value: '${weather.precipMm} mm',
+                icon: Icons.umbrella_outlined,
+              ),
+              _DetailTile(
+                label: 'WIND SPEED',
+                value: '${weather.windKph.round()} km/h',
+                icon: Icons.air,
+              ),
+            ],
+          ),
+          const SizedBox(height: 40),
+          const Divider(),
+          Center(
+            child: Text(
+              'Last synced at ${DateFormat('h:mm a').format(weather.lastUpdated)}',
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailTile extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _DetailTile({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 150,
+      width: 150,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withAlpha(20),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                height: 130,
-                width: 130,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withAlpha(20),
-                  border: Border.all(style: BorderStyle.none),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                margin: EdgeInsets.all(12),
-                padding: EdgeInsets.all(8),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.water_drop_outlined, size: 15),
-                        Text('Precipitation'),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      weather.precipMm.toString(),
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 50,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: 20),
-              Container(
-                height: 130,
-                width: 130,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withAlpha(20),
-                  border: Border.all(style: BorderStyle.none),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: EdgeInsets.all(8),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [Icon(Icons.air, size: 15), Text('Wind Speed')],
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      '${weather.windKph.toString()}%',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 50,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const Divider(height: 40),
+          const Spacer(),
           Text(
-            'Last updated: ${DateFormat('h:mm a').format(weather.lastUpdated)}',
-            style: Theme.of(context).textTheme.labelLarge,
+            value,
+            style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
