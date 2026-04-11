@@ -51,9 +51,9 @@ WEATHER_API_KEY=your_api_key_here
 
 3. Installation
 
-# Clone the repository
-
 ```bash
+#Clone the repository
+
 git clone https://github.com/dilawarzAlgorithm/weather.git
 
 # Install dependencies
