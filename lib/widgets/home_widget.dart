@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:weather/models/weather.dart';
+import 'package:weather/provider/setting_notifier.dart';
 import 'package:weather/provider/weather_notifier.dart';
 
 class Home extends ConsumerStatefulWidget {
@@ -24,6 +25,7 @@ class _HomeState extends ConsumerState<Home> {
   @override
   Widget build(BuildContext context) {
     final weatherList = ref.watch(savedWeatherProvider);
+    final settings = ref.watch(savedSettingProvider);
 
     if (weatherList.isEmpty) {
       return Center(
@@ -54,7 +56,10 @@ class _HomeState extends ConsumerState<Home> {
           },
           itemCount: weatherList.length,
           itemBuilder: (context, index) {
-            return _WeatherPage(weather: weatherList[index]);
+            return _WeatherPage(
+              weather: weatherList[index],
+              settings: settings,
+            );
           },
         ),
         if (weatherList.length > 1)
@@ -85,8 +90,9 @@ class _HomeState extends ConsumerState<Home> {
 
 class _WeatherPage extends StatelessWidget {
   final WeatherModel weather;
+  final SettingsState settings;
 
-  const _WeatherPage({required this.weather});
+  const _WeatherPage({required this.weather, required this.settings});
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +122,9 @@ class _WeatherPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${weather.tempC.round()}°',
+                    (settings.isCelsius)
+                        ? '${weather.tempC.round()}°'
+                        : '${weather.tempF.round()}°',
                     style: const TextStyle(
                       fontSize: 100,
                       fontWeight: FontWeight.w200,
@@ -135,7 +143,7 @@ class _WeatherPage extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            '↓${weather.minTempC.round()}° / ↑${weather.maxTempC.round()}°\nFeels like: ${weather.feelsLikeC.round()}°\n${DateFormat('EEEE, hh:mm a').format(weather.lastUpdated)}',
+            '↓${(settings.isCelsius) ? weather.minTempC.round() : weather.minTempF.round()}° / ↑${(settings.isCelsius) ? weather.maxTempC.round() : weather.maxTempF.round()}°\nFeels like: ${(settings.isCelsius) ? weather.feelsLikeC.round() : weather.feelsLikeF.round()}°\n${DateFormat('EEEE, hh:mm a').format(weather.lastUpdated)}',
             style: Theme.of(context).textTheme.bodyMedium!.copyWith(
               color: Theme.of(
                 context,
@@ -167,7 +175,10 @@ class _WeatherPage extends StatelessWidget {
               ),
               _DetailTile(
                 label: 'WIND SPEED',
-                value: '${weather.windKph.round()} km/h',
+                // value: '${(settings.isMph)? weather.windMph : weather.windKph.round()} km/h',
+                value: (settings.isMph)
+                    ? '${weather.windMph.round()} mp/h'
+                    : '${weather.windKph.round()} km/h',
                 icon: Icons.air,
               ),
             ],

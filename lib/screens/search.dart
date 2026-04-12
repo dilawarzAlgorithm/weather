@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:weather/provider/setting_notifier.dart';
 import 'package:weather/provider/weather_notifier.dart';
 import 'package:weather/widgets/home_widget.dart';
 import 'package:weather/screens/location.dart';
@@ -23,7 +24,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     });
 
     try {
-      // Use ref.read for actions, and await the future
       await ref.read(savedWeatherProvider.notifier).syncAllWeather();
 
       if (mounted) {
@@ -57,6 +57,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     var lists = ref.watch(savedWeatherProvider);
+    final settings = ref.watch(savedSettingProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -124,7 +125,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         '${list.city}\n${DateFormat("EE, dd MMMM 'at' hh:mm a").format(list.lastUpdated)}',
                       ),
                       trailing: SizedBox(
-                        width: 115,
+                        width: 130,
                         child: Row(
                           children: [
                             Image.network(list.iconUrl, width: 40),
@@ -133,7 +134,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  '${list.feelsLikeC.round().toString()}°',
+                                  '${(settings.isCelsius) ? list.feelsLikeC.round() : list.feelsLikeF.round()}°',
                                   style: Theme.of(context).textTheme.bodyMedium!
                                       .copyWith(
                                         color: Theme.of(
@@ -143,7 +144,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                       ),
                                 ),
                                 Text(
-                                  '↓${list.minTempC.round()}° /↑${list.maxTempC.round()}°',
+                                  '↓${(settings.isCelsius) ? list.minTempC.round() : list.minTempF.round()}° /↑${(settings.isCelsius) ? list.maxTempC.round() : list.maxTempF.round()}°',
                                   style: Theme.of(context).textTheme.bodyMedium!
                                       .copyWith(
                                         color: Theme.of(

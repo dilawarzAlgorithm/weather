@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:weather/screens/search.dart';
+import 'package:weather/screens/setting.dart';
 import 'package:weather/widgets/home_widget.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -21,7 +22,7 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       drawer: Drawer(
-        backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(240),
+        backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(250),
         elevation: 2,
         child: Column(
           children: [
@@ -60,7 +61,27 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Divider(height: 1, thickness: 1),
+            Divider(height: 1, thickness: 1, color: Colors.black),
+            ListTile(
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (cntx) => SettingScreen()));
+              },
+              leading: Icon(Icons.settings),
+              title: Text('Setting'),
+              tileColor: Theme.of(
+                context,
+              ).colorScheme.secondaryFixed.withAlpha(220),
+              textColor: Theme.of(context).colorScheme.onSecondaryFixed,
+              iconColor: Theme.of(context).colorScheme.onSecondaryFixed,
+            ),
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: const Color.fromARGB(125, 0, 0, 0),
+            ),
             ListTile(
               onTap: () {
                 Navigator.of(context).pop();
@@ -76,7 +97,11 @@ class HomeScreen extends StatelessWidget {
               textColor: Theme.of(context).colorScheme.onSecondaryFixed,
               iconColor: Theme.of(context).colorScheme.onSecondaryFixed,
             ),
-            Divider(height: 1, thickness: 1),
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: const Color.fromARGB(125, 0, 0, 0),
+            ),
           ],
         ),
       ),
