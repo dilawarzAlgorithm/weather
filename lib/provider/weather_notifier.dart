@@ -1,13 +1,38 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather/models/weather.dart';
 import 'package:weather/provider/weather_api_provider.dart';
 
 final weatherRepositoryProvider = Provider((ref) => WeatherApiProvider());
 
 class SavedWeatherNotifier extends Notifier<List<WeatherModel>> {
+  static const _storageKey = 'saved_weather_list';
+
   @override
   List<WeatherModel> build() {
+    _loadFromStorage();
     return [];
+  }
+
+  Future<void> _saveToStorage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String> jsonList = state
+        .map((item) => json.encode(item.toJson()))
+        .toList();
+    await prefs.setStringList(_storageKey, jsonList);
+  }
+
+  Future<void> _loadFromStorage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String>? jsonList = prefs.getStringList(_storageKey);
+
+    if (jsonList != null) {
+      state = jsonList.map((item) {
+        return WeatherModel.fromJson(json.decode(item));
+      }).toList();
+      syncAllWeather();
+    }
   }
 
   Future<void> addCity(String cityName) async {
@@ -24,6 +49,7 @@ class SavedWeatherNotifier extends Notifier<List<WeatherModel>> {
       }
 
       state = [...state, weather];
+      await _saveToStorage();
     } catch (e) {
       rethrow;
     }
@@ -43,6 +69,7 @@ class SavedWeatherNotifier extends Notifier<List<WeatherModel>> {
       }
 
       state = [weather, ...state];
+      await _saveToStorage();
     } catch (e) {
       rethrow;
     }
@@ -50,6 +77,7 @@ class SavedWeatherNotifier extends Notifier<List<WeatherModel>> {
 
   void removeCity(String id) {
     state = state.where((item) => item.id != id).toList();
+    _saveToStorage();
   }
 
   Future<void> syncAllWeather() async {
@@ -79,6 +107,7 @@ class SavedWeatherNotifier extends Notifier<List<WeatherModel>> {
     newList.insert(newIndex, item);
 
     state = newList;
+    _saveToStorage();
   }
 }
 

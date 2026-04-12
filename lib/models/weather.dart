@@ -49,21 +49,51 @@ class WeatherModel {
     required this.uv,
   });
 
-  factory WeatherModel.fromJson(Map<String, dynamic> json) {
-    final current = json['current'];
-    final location = json['location'];
-    final dayForecast = json['forecast']['forecastday'][0]['day'];
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': city,
+      'region': region,
+      'country': country,
+      'temp_c': tempC,
+      'temp_f': tempF,
+      'maxtemp_c': maxTempC,
+      'maxtemp_f': maxTempF,
+      'mintemp_c': minTempC,
+      'mintemp_f': minTempF,
+      'feelslike_c': feelsLikeC,
+      'feelslike_f': feelsLikeF,
+      'condition_text': condition,
+      'icon': iconUrl,
+      'wind_mph': windMph,
+      'wind_kph': windKph,
+      'wind_dir': windDir,
+      'precip_mm': precipMm,
+      'precip_in': precipIn,
+      'humidity': humidity,
+      'is_day': isDay,
+      'uv': uv,
+    };
+  }
 
-    // Create a stable ID using city and region to avoid duplicates
-    final cityId = '${location['name']}_${location['region']}'
-        .toLowerCase()
-        .replaceAll(' ', '_');
+  factory WeatherModel.fromJson(Map<String, dynamic> json) {
+    final bool isFromApi = json.containsKey('current');
+
+    final current = isFromApi ? json['current'] : json;
+    final location = isFromApi ? json['location'] : json;
+    final dayForecast = isFromApi
+        ? json['forecast']['forecastday'][0]['day']
+        : json;
 
     return WeatherModel(
-      id: cityId,
-      city: location['name'],
-      region: location['region'],
-      country: location['country'] ?? '',
+      id: isFromApi
+          ? '${location['name']}_${location['region']}'
+                .toLowerCase()
+                .replaceAll(' ', '_')
+          : json['id'],
+      city: isFromApi ? location['name'] : json['name'],
+      region: isFromApi ? location['region'] : json['region'],
+      country: isFromApi ? location['country'] : json['country'],
       lastUpdated: DateTime.now(),
       tempC: (current['temp_c'] as num).toDouble(),
       tempF: (current['temp_f'] as num).toDouble(),
@@ -73,8 +103,12 @@ class WeatherModel {
       minTempF: (dayForecast['mintemp_f'] as num).toDouble(),
       feelsLikeC: (current['feelslike_c'] as num).toDouble(),
       feelsLikeF: (current['feelslike_f'] as num).toDouble(),
-      condition: current['condition']['text'],
-      iconUrl: 'https:${current['condition']['icon']}',
+      condition: isFromApi
+          ? current['condition']['text']
+          : json['condition_text'],
+      iconUrl: isFromApi
+          ? 'https:${current['condition']['icon']}'
+          : json['icon'],
       windMph: (current['wind_mph'] as num).toDouble(),
       windKph: (current['wind_kph'] as num).toDouble(),
       windDir: current['wind_dir'],
