@@ -1,48 +1,51 @@
 # WeatherPro 🌦️
 
-A high-performance, location-aware weather application built with Flutter, focusing on clean architecture, modular design, and fluid user experiences.
+A professional-grade, location-aware weather application built with Flutter. This app focuses on a clean user experience, horizontal swipe navigation, and persistent user preferences.
 
 ## 🚀 Key Features
 
-Multi-City Swipe Navigation: Uses a PageView.builder with page indicators to allow users to swipe seamlessly between saved locations.
+- **Multi-City Swipe Navigation:** Effortlessly navigate through your saved locations using a `PageView` with smooth transitions and page indicators.
 
-## Dynamic Search & Management:
+- **Persistent Storage:**
+  - **Saved Locations:** Your city list is automatically saved to local storage and restored on app launch.
 
-1. **Reorderable Lists:** Long-press to drag and drop cities to prioritize your view.
+  - **User Settings:** Preferences for Temperature (Celsius/Fahrenheit) and Speed (Mph/Kph) units are remembered across sessions.
 
-2. **Swipe-to-Delete:** Quickly remove locations using the Dismissible pattern.
+- **Dynamic Unit Switching:** Real-time conversion across the entire app when units are toggled in the Settings menu.
 
-3. **GPS Location Awareness:** One-tap weather fetching for your current location using the location package.
+- **Smart Data Handling:**
+  - **Auto-Sync:** Background synchronization ensures your weather data is fresh every time you open the app.
 
-4. **Advanced Weather Metrics:** Real-time tracking of UV Index, Humidity, Precipitation, and Wind Speed using responsive Wrap layouts.
+  - **Search & Management:** Add cities by name, reorder them with drag-and-drop, or swipe to delete.
 
-5. **Deep Data Insights:** Displays today's High (Max) and Low (Min) temperatures alongside "Feels Like" data.
+- **GPS Integration:** One-tap weather fetching for your current physical location.
+
+- **Clean UI Architecture:** Modern, minimal design using custom Google Fonts.
 
 ## 🛠️ Tech Stack
 
-1. Framework: Flutter (Material 3)
+- **Framework:** Flutter
 
-2. State Management: Riverpod (Notifier & StateProvider)
+- **State Management:** Riverpod (Notifiers for reactive state)
 
-3. Networking: HTTP with JSON Serialization
+- **Persistence:** `shared_preferences` (Local Disk Storage)
 
-4. Local Config: flutter_dotenv for secure API key management
+- **Networking:** HTTP for REST API integration
 
-5. Fonts: Google Fonts (Ubuntu Condensed)
+- **Configuration:** `flutter_dotenv` for secure environment variables
 
-6. Location Hardware: location package
+- **Typography:** Google Fonts (Ubuntu Condensed)
 
 ## 📂 Getting Started
 
 1. Prerequisites
+   - Flutter SDK installed
 
-- Flutter SDK installed
-
-- A free API Key from WeatherAPI.com
+   - A free API Key from [WeatherApi.com](https://www.weatherapi.com/)
 
 2. Environment Setup
 
-Create a folder named .env in your root directory and add a file named .env inside it:
+Create a folder named `.env` in your root directory and add a file named `.env` inside it:
 
 ```bash
 BASE_URL=https://api.weatherapi.com/v1/forecast.json
@@ -52,15 +55,24 @@ WEATHER_API_KEY=your_api_key_here
 3. Installation
 
 ```bash
-#Clone the repository
-
+# Clone the repository
 git clone https://github.com/dilawarzAlgorithm/weather.git
 
 # Install dependencies
-
 flutter pub get
 
 # Run the project
-
 flutter run
 ```
+
+## 📱 Project Structure
+
+- `lib/models`: Data structures and JSON serialization.
+
+- `lib/provider`: Riverpod Notifiers and API Repository implementation.
+
+- `lib/screens`: Primary UI views (Home, Search, Settings, Location).
+
+- `lib/widgets`: Reusable UI components and layout helpers.
+
+> Developed with a focus on Flutter best practices and scalable state management.

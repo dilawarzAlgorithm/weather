@@ -138,8 +138,6 @@ class _LocationState extends ConsumerState<LocationScreen> {
                 ],
               ),
               const Spacer(),
-              const Center(child: Text('Map View will be here')),
-              const Spacer(),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
