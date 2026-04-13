@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:weather/models/weather.dart';
+import 'package:weather/provider/page_notifier.dart';
 import 'package:weather/provider/setting_notifier.dart';
 import 'package:weather/provider/weather_notifier.dart';
 
@@ -14,7 +15,6 @@ class Home extends ConsumerStatefulWidget {
 
 class _HomeState extends ConsumerState<Home> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
 
   @override
   void dispose() {
@@ -26,6 +26,13 @@ class _HomeState extends ConsumerState<Home> {
   Widget build(BuildContext context) {
     final weatherList = ref.watch(savedWeatherProvider);
     final settings = ref.watch(savedSettingProvider);
+    final currentPage = ref.watch(pageProvider);
+
+    ref.listen<int>(pageProvider, (previous, next) {
+      if (_pageController.hasClients && _pageController.page?.round() != next) {
+        _pageController.jumpToPage(next);
+      }
+    });
 
     if (weatherList.isEmpty) {
       return Center(
@@ -50,9 +57,7 @@ class _HomeState extends ConsumerState<Home> {
         PageView.builder(
           controller: _pageController,
           onPageChanged: (index) {
-            setState(() {
-              _currentPage = index;
-            });
+            ref.read(pageProvider.notifier).setPage(index);
           },
           itemCount: weatherList.length,
           itemBuilder: (context, index) {
@@ -71,11 +76,11 @@ class _HomeState extends ConsumerState<Home> {
                 weatherList.length,
                 (index) => Container(
                   margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: _currentPage == index ? 12 : 8,
+                  width: currentPage == index ? 12 : 8,
                   height: 8,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _currentPage == index
+                    color: currentPage == index
                         ? Theme.of(context).colorScheme.primary
                         : Colors.grey.withValues(alpha: 0.5),
                   ),
@@ -175,7 +180,6 @@ class _WeatherPage extends StatelessWidget {
               ),
               _DetailTile(
                 label: 'WIND SPEED',
-                // value: '${(settings.isMph)? weather.windMph : weather.windKph.round()} km/h',
                 value: (settings.isMph)
                     ? '${weather.windMph.round()} mp/h'
                     : '${weather.windKph.round()} km/h',

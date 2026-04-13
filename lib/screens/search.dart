@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:weather/provider/page_notifier.dart';
 import 'package:weather/provider/setting_notifier.dart';
 import 'package:weather/provider/weather_notifier.dart';
-import 'package:weather/widgets/home_widget.dart';
 import 'package:weather/screens/location.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -119,7 +119,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     color: Theme.of(context).colorScheme.primaryContainer,
                     margin: EdgeInsets.all(12),
                     child: ListTile(
-                      onTap: () => Home(),
+                      onTap: () {
+                        ref.read(pageProvider.notifier).setPage(index);
+                        Navigator.of(context).pop();
+                      },
                       title: Text(list.city),
                       subtitle: Text(
                         '${list.city}\n${DateFormat("EE, dd MMMM 'at' hh:mm a").format(list.lastUpdated)}',
