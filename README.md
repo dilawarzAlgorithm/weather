@@ -1,6 +1,7 @@
 # WeatherPro 🌦️
 
-A professional-grade, location-aware weather application built with Flutter. This app focuses on a clean user experience, horizontal swipe navigation, and persistent user preferences.
+A professional-grade, location-aware weather application built with Flutter. This app focuses on a clean user experience, horizontal swipe navigation, and persistent user preferences while showcasing scalable state management using Riverpod.<br>
+This project highlights real-world API integration, local data storage, and reactive state handling, making it a practical example for learning how Riverpod works in Flutter applications.
 
 ## 🚀 Key Features
 
